@@ -16,8 +16,11 @@ files = os.listdir(transcript_path)
 for file in files:
     # get the channel name
     match = re.search(r'#(.*?)-', file)
-    channel_name = match.group(1)
+    
+    if(match == None):
+        continue
 
+    channel_name = match.group(1)
     print("Generate Image for "+channel_name)
 
     # load chat transcript text file
