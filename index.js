@@ -1,19 +1,18 @@
-require('dotenv').config(); // pour lire les variables d'environnement
 const tmi = require('tmi.js'); // pour utiliser l'API Twitch
 const fs = require('fs'); // pour enregistrer le texte dans un fichier
-// const badWords = require('bad-words');
-// const filter = new badWords();
-// const cleanMessage = filter.clean(message);
 const filteredBot = require('./filteredBot.json');
+
+//get file in directory
+const channels = fs.readdirSync('./logoChannel').filter(file => file.endsWith('.png')).map(file => file.replace('.png', ''))
 
 // Connexion à l'API Twitch
 const client = new tmi.Client({
-    options: { debug: true },
+    options: { debug: false, },
     connection: {
         reconnect: true,
         secure: true
     },
-    channels: process.env.TWITCH_CHANNELS.split(',') // récupération des chaînes à écouter depuis le fichier .env
+    channels: channels // récupération des chaînes à écouter
 });
 
 // Enregistrement des messages de tchat dans un fichier

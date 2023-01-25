@@ -23,7 +23,6 @@
   "homepage": "https://github.com/FabienBounoir/Twouns#readme",
   "dependencies": {
     "bad-words": "^3.0.4",
-    "dotenv": "^16.0.3",
     "fs": "^0.0.1-security",
     "tmi.js": "^1.8.5"
   }

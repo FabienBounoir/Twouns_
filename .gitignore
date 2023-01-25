@@ -1,3 +1,6 @@
 .env
 node_modules
 word_cloud
+backup
+tchatTranscript
+image
