@@ -157,16 +157,17 @@ for file in files:
 
     # Envoi d'un tweet
     api.update_status_with_media(
-        "@"
-        + twitter_name
-        + " Voici le récapitulatif du mois de "
+        "Voici le récapitulatif du mois de "
         + months[int(month) - 1]
         + " "
         + year
-        + " sur ton chat https://www.twitch.tv/"
-        + channel_name
-        + " !",
-        "image.png",
+        + " sur ton chat de "
+        "@"
+        + twitter_name +
+        " !\n#Twouns_ #Stats #" +
+        channel_name
+        + " #Twitch",
+        channel_name+".png",
         file=open("./image/" + channel_name + "-" +
                   month + "_" + year + ".png", "rb"),
     )
