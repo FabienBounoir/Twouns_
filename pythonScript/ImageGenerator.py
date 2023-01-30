@@ -61,17 +61,23 @@ print("✅ Generate Image for " + month + "_" + year)
 for file in files:
     print("_________________________________________________________")
 
-    twitter_name = ""
+    # get the month and year in chat-#kaatsup-12-2022.txt
+    match = re.search(r"chat-#(.*)-(\d+)-(\d+)", file)
 
-    # get the channel name
-    match = re.search(r"chat-#(.*?)\.", file)
     if match == None:
         print("❌ File " + file + " is not a chat transcript file")
         continue
 
     channel_name = match.group(1)
+    file_month = match.group(2)
+    file_year = match.group(3)
 
-    print("✅ Generate Image for " + channel_name + "chat...")
+    if (file_month != month or file_year != year):
+        continue
+
+    twitter_name = ""
+
+    print("✅ Generate Image for " + channel_name + " chat...")
 
     # load chat transcript text file
     text = open(
@@ -86,7 +92,8 @@ for file in files:
     for logo_file in logo_files:
         if logo_file.find(channel_name) != -1:
             twitter_name = logo_file.split("-")[1].split(".")[0]
-            logo_color = np.array(Image.open(os.path.join(d, logo_path + logo_file)))
+            logo_color = np.array(Image.open(
+                os.path.join(d, logo_path + logo_file)))
 
     for file_name in os.listdir(logo_path):
         if file_name.startswith(channel_name):
@@ -112,7 +119,8 @@ for file in files:
     # some finesse: we enforce boundaries between colors so they get less washed out.
     # For that we do some edge detection in the image
     edges = np.mean(
-        [gaussian_gradient_magnitude(logo_color[:, :, i] / 255.0, 2) for i in range(3)],
+        [gaussian_gradient_magnitude(
+            logo_color[:, :, i] / 255.0, 2) for i in range(3)],
         axis=0,
     )
     print("✅ Logo edges generated for " + channel_name)
@@ -159,7 +167,8 @@ for file in files:
         + channel_name
         + " !",
         "image.png",
-        file=open("./image/" + channel_name + "-" + month + "_" + year + ".png", "rb"),
+        file=open("./image/" + channel_name + "-" +
+                  month + "_" + year + ".png", "rb"),
     )
 
     print("✅ Tweet sent for " + channel_name)
