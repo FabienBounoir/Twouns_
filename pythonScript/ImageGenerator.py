@@ -1,12 +1,48 @@
 import os
-from PIL import Image
+from dotenv import load_dotenv
 
-from datetime import datetime, timedelta
 import re
+import tweepy
 import numpy as np
 import matplotlib.pyplot as plt
+
+
+from PIL import Image
+from datetime import datetime, timedelta
 from scipy.ndimage import gaussian_gradient_magnitude
 from wordcloud import WordCloud, ImageColorGenerator
+
+months = [
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre",
+]
+
+# load env variables
+print("✅ Load env variables")
+load_dotenv()
+
+# Twitter API credentials
+consumer_key = os.getenv("API_KEY")
+consumer_secret = os.getenv("API_SECRET_KEY")
+access_token = os.getenv("ACCESS_TOKEN")
+access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
+
+# Authentification
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth)
+print("✅ Authentification Twitter")
+
 
 d = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 
@@ -23,8 +59,9 @@ year = month_ago.strftime("%Y")
 print("✅ Generate Image for " + month + "_" + year)
 
 for file in files:
-
     print("_________________________________________________________")
+
+    twitter_name = ""
 
     # get the channel name
     match = re.search(r"chat-#(.*?)\.", file)
@@ -48,6 +85,7 @@ for file in files:
 
     for logo_file in logo_files:
         if logo_file.find(channel_name) != -1:
+            twitter_name = logo_file.split("-")[1].split(".")[0]
             logo_color = np.array(Image.open(os.path.join(d, logo_path + logo_file)))
 
     for file_name in os.listdir(logo_path):
@@ -85,9 +123,9 @@ for file in files:
     # relative_scaling=0 means the frequencies in the data are reflected less
     # acurately but it makes a better picture
     wc = WordCloud(
-        max_words=2000,
+        max_words=10000,
         mask=logo_mask,
-        max_font_size=40,
+        max_font_size=20,
         random_state=42,
         relative_scaling=0,
     )
@@ -103,18 +141,34 @@ for file in files:
     plt.figure(figsize=(10, 10))
     plt.imshow(wc, interpolation="bilinear")
     plt.axis("off")
-    wc.to_file(
-        "./../image/" + channel_name + "-" + month + "_" + year + ".png"
-    )  # + "-" + month + "_" + year +
-
+    wc.to_file("./image/" + channel_name + "-" + month + "_" + year + ".png")
     print("✅ Image saved for " + channel_name)
 
-    if os.path.exists("./../tchatTranscript/" + file):
-        os.remove("./../tchatTranscript/" + file)
-        print("✅ File " + file + " deleted")
-    else:
-        print(f"{'./../tchatTranscript/'+file} n'existe pas")
+    if channel_name == "":
+        continue
 
+    # Envoi d'un tweet
+    api.update_status_with_media(
+        "@"
+        + twitter_name
+        + " Voici le récapitulatif du mois de "
+        + months[int(month) - 1]
+        + " "
+        + year
+        + " sur ton chat https://www.twitch.tv/"
+        + channel_name
+        + " !",
+        "image.png",
+        file=open("./image/" + channel_name + "-" + month + "_" + year + ".png", "rb"),
+    )
+
+    print("✅ Tweet sent for " + channel_name)
+
+# if os.path.exists("./../tchatTranscript/" + file):
+#     os.remove("./../tchatTranscript/" + file)
+#     print("✅ File " + file + " deleted")
+# else:
+#     print(f"{'./../tchatTranscript/'+file} n'existe pas")
 
 # plt.figure(figsize=(10, 10))
 # plt.title("Original Image")
@@ -123,5 +177,5 @@ for file in files:
 # plt.figure(figsize=(10, 10))
 # plt.title("Edge map")
 # plt.imshow(edges)
-# plt.axis('off')
+# plt.axis("off")
 # plt.show()
