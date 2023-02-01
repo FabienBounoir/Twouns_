@@ -53,7 +53,7 @@ now = datetime.now()
 
 month_ago = now - timedelta(days=now.day)
 
-month = month_ago.strftime("%m")
+month = month_ago.strftime("%m").lstrip('0')
 year = month_ago.strftime("%Y")
 
 print("✅ Generate Image for " + month + "_" + year)
@@ -149,7 +149,8 @@ for file in files:
     plt.figure(figsize=(10, 10))
     plt.imshow(wc, interpolation="bilinear")
     plt.axis("off")
-    wc.to_file("./image/" + channel_name + "-" + month + "_" + year + ".png")
+    wc.to_file("./../image/" + channel_name +
+               "-" + month + "_" + year + ".png")
     print("✅ Image saved for " + channel_name)
 
     if channel_name == "":
@@ -161,14 +162,14 @@ for file in files:
         + months[int(month) - 1]
         + " "
         + year
-        + " sur ton chat de "
+        + " sur le chat de "
         "@"
         + twitter_name +
         " !\n#Twouns_ #Stats #" +
         channel_name
         + " #Twitch",
         channel_name+".png",
-        file=open("./image/" + channel_name + "-" +
+        file=open("./../image/" + channel_name + "-" +
                   month + "_" + year + ".png", "rb"),
     )
 
