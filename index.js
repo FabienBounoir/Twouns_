@@ -3,7 +3,7 @@ const fs = require('fs'); // pour enregistrer le texte dans un fichier
 const filteredBot = require('./filteredBot.json');
 
 //get file in directory
-const channels = fs.readdirSync('./logoChannel').filter(file => file.endsWith('.png')).map(file => file.replace('.png', ''))
+const channels = fs.readdirSync('./logoChannel').filter(file => file.endsWith('.png')).map(file => file.split("-")[0])
 
 // Connexion à l'API Twitch
 const client = new tmi.Client({
