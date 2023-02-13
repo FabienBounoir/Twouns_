@@ -21,7 +21,7 @@ client.on('message', (channel, tags, message, self) => {
     let date = new Date(); // récupération de la date
 
     if (filteredBot.includes(tags.username) || (tags.username == (channel.replace("#", "")))) return; // ignore les messages envoyés par les bots filtrés
-    fs.appendFileSync(`./tchatTranscript/chat-${channel}-${date.getMonth()}-${date.getFullYear()}.txt`, `${message}\n`); // enregistrement du message dans un fichier
+    fs.appendFileSync(`./tchatTranscript/chat-${channel}-${date.getMonth() + 1}-${date.getFullYear()}.txt`, `${message}\n`); // enregistrement du message dans un fichier
     fs.appendFileSync(`./tchatUser/pseudo-${channel}-${date.getMonth()}-${date.getFullYear()}.txt`, `${tags.username}\n`); // enregistrement du nom d'utilisateur dans un fichier
 });
 
