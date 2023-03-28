@@ -4,3 +4,8 @@ word_cloud
 backup
 tchatTranscript
 image_backup
+tchat/*.txt
+user/*.txt
+image/*.png
+archive-tchat/*.txt
+archive-user/*.txt
