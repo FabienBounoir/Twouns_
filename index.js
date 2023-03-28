@@ -19,8 +19,6 @@ const client = new tmi.Client({
 client.on('message', (channel, tags, message, self) => {
     if (self) return; // ignore les messages envoyés par le bot lui-même
 
-    console.log(`${tags.username}: ${message}`)
-
     channel = channel.replace("#", "")
     if (filteredBot.includes(tags.username) || (tags.username == channel)) return; // ignore les messages envoyés par les bots filtrés
     fs.appendFileSync(`./tchat/${channel}.txt`, `${message}\n`); // enregistrement du message dans un fichier
