@@ -5,7 +5,6 @@ Twouns_ est un projet passionnant qui se concentre sur le développement. Il gé
 
 
 
-
 ## Démarrer le projet
 
 Pour demarrer le transcript Twitch
@@ -22,7 +21,9 @@ Pour générer l'image
   python3 pythonScript/ImageGenerator.py
 ```
 
+## Automatisation de l'exécution du script Python
 
+Si vous voulez automatiser l'exécution d'un script Python sur une base quotidienne, vous pouvez utiliser le planificateur de tâches "Cron" disponible sur les systèmes d'exploitation Linux.
 
 
 ## Demo
