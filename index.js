@@ -18,11 +18,11 @@ const client = new tmi.Client({
 // Enregistrement des messages de tchat dans un fichier
 client.on('message', (channel, tags, message, self) => {
     if (self) return; // ignore les messages envoyés par le bot lui-même
-    let date = new Date(); // récupération de la date
 
-    if (filteredBot.includes(tags.username) || (tags.username == (channel.replace("#", "")))) return; // ignore les messages envoyés par les bots filtrés
-    fs.appendFileSync(`./tchatTranscript/chat-${channel}-${date.getMonth() + 1}-${date.getFullYear()}.txt`, `${message}\n`); // enregistrement du message dans un fichier
-    fs.appendFileSync(`./tchatUser/pseudo-${channel}-${date.getMonth()}-${date.getFullYear()}.txt`, `${tags.username}\n`); // enregistrement du nom d'utilisateur dans un fichier
+    let channel = channel.replace("#", "")
+    if (filteredBot.includes(tags.username) || (tags.username == channel)) return; // ignore les messages envoyés par les bots filtrés
+    fs.appendFileSync(`./tchat/${channel}.txt`, `${message}\n`); // enregistrement du message dans un fichier
+    fs.appendFileSync(`./user/${channel}.txt`, `${tags.username}\n`); // enregistrement du nom d'utilisateur dans un fichier
 });
 
 // Connexion au client
