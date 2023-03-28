@@ -119,7 +119,7 @@ for channel_name in channels_of_the_day:
     # create mask  white is "masked out"
     logo_mask = logo_color.copy()
     logo_mask[logo_mask.sum(axis=2) == 0] = 255
-    print("🖍️ Logo mask generated for " + channel_name)
+    print("🖍️  Logo mask generated for " + channel_name)
 
     # some finesse: we enforce boundaries between colors so they get less washed out.
     # For that we do some edge detection in the image
@@ -128,7 +128,7 @@ for channel_name in channels_of_the_day:
             logo_color[:, :, i] / 255.0, 2) for i in range(3)],
         axis=0,
     )
-    print("✍️ Logo edges generated for " + channel_name)
+    print("✍️  Logo edges generated for " + channel_name)
 
     logo_mask[edges > 0.08] = 255
 
@@ -162,18 +162,18 @@ for channel_name in channels_of_the_day:
         continue
 
     # Envoi d'un tweet
-    # api.update_status_with_media(
-    #     "Voici le récapitulatif des 30 derniers jours sur le chat de @ "
-    #     + twitter_name +
-    #     " !\n#Twouns_ #Stats #" +
-    #     channel_name
-    #     + " #Twitch",
-    #     channel_name+".png",
-    #     file=open("./../image/" + channel_name +
-    #            "_" + dateFormated + ".png", "rb"),
-    # )
+    api.update_status_with_media(
+        "Voici le récapitulatif des 30 derniers jours sur le chat de @ "
+        + twitter_name +
+        " !\n#Twouns_ #Stats #" +
+        channel_name
+        + " #Twitch",
+        channel_name+".png",
+        file=open("./../image/" + channel_name +
+                  "_" + dateFormated + ".png", "rb"),
+    )
 
-    # print("🐧 Tweet sent for " + channel_name)
+    print("🐧 Tweet sent for " + channel_name)
 
     # Deplacer le fichier dans un dossier archive
     shutil.move("./../tchat/" + channel_name + ".txt",
