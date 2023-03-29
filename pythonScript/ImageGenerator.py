@@ -73,6 +73,9 @@ d = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 print("🎆 Generate Image for this channels:")
 print(channels_of_the_day)
 
+with open('customTextTweet.json') as f:
+    sentences = json.load(f)
+
 for channel_name in channels_of_the_day:
     print("_________________________________________________________")
 
@@ -162,7 +165,7 @@ for channel_name in channels_of_the_day:
         continue
 
     # Envoi d'un tweet
-    api.update_status_with_media(
+    tweetSend = api.update_status_with_media(
         "Voici le récapitulatif des 30 derniers jours sur le chat de @"
         + twitter_name +
         " !\n#Twouns_ #Stats #" +
@@ -173,11 +176,60 @@ for channel_name in channels_of_the_day:
                   "_" + dateFormated + ".png", "rb"),
     )
 
-    print("🐧 Tweet sent for " + channel_name)
+    print("🐧 Tweet CHANNEL sent for " + channel_name)
 
     # Deplacer le fichier dans un dossier archive
     shutil.move("./../tchat/" + channel_name + ".txt",
                 "./../archive-tchat/" + channel_name + "_" + dateFormated + ".txt")
+
+    # load chat transcript text file
+    try:
+        text = open(
+            os.path.join(d, "./../user/" + channel_name + ".txt"), encoding="utf-8"
+        ).read()
+    except:
+        print("❌ No user transcript found for " + channel_name)
+        continue
+
+    tweet_id = tweetSend.id
+
+    wc.generate(text)
+    plt.imshow(wc)
+
+    # create coloring from image
+    image_colors = ImageColorGenerator(logo_color)
+    wc.recolor(color_func=image_colors)
+    plt.figure(figsize=(10, 10))
+    plt.imshow(wc, interpolation="bilinear")
+    plt.axis("off")
+    wc.to_file("./../image/" + channel_name + '_user' +
+               "_" + dateFormated + ".png")
+    print("💾 Image USER saved for " + channel_name)
+
+    if channel_name == "":
+        continue
+
+    if "user" in sentences.get(channel_name, {}):
+        sentenceUser = sentences[channel_name]["user"]
+    else:
+        sentenceUser = "Si tu fais partie des spectateurs les plus fidèles, tu figures obligatoirement sur ce beau dessin."
+
+    # Envoi d'un tweet
+    tweetSend = api.update_status_with_media(
+        sentenceUser +
+        " #" +
+        channel_name,
+        channel_name+"_user.png",
+        file=open("./../image/" + channel_name + '_user' +
+                  "_" + dateFormated + ".png", "rb"),
+        in_reply_to_status_id=tweet_id
+    )
+
+    print("🐧 Tweet USER sent for " + channel_name)
+
+    # Deplacer le fichier dans un dossier archive
+    shutil.move("./../user/" + channel_name + ".txt",
+                "./../archive-user/" + channel_name + "_" + dateFormated + ".txt")
 
 
 print("🚀 All images generated")
