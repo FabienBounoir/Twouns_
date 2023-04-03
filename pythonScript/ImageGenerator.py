@@ -166,11 +166,10 @@ for channel_name in channels_of_the_day:
 
     # Envoi d'un tweet
     tweetSend = api.update_status_with_media(
-        "Voici le récapitulatif des 30 derniers jours sur le chat de @"
+        "Voici le récapitulatif des 30 derniers jours sur le chat Twitch de @"
         + twitter_name +
-        " !\n#Twouns_ #Stats #" +
-        channel_name
-        + " #Twitch",
+        " !\n#" +
+        channel_name,
         channel_name+".png",
         file=open("./../image/" + channel_name +
                   "_" + dateFormated + ".png", "rb"),
