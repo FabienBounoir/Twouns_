@@ -213,18 +213,21 @@ for channel_name in channels_of_the_day:
     else:
         sentenceUser = "Si tu fais partie des spectateurs les plus fidèles, tu figures obligatoirement sur ce beau dessin."
 
-    # Envoi d'un tweet
-    tweetSend = api.update_status_with_media(
-        sentenceUser +
-        " #" +
-        channel_name,
-        channel_name+"_user.png",
-        file=open("./../image/" + channel_name + '_user' +
-                  "_" + dateFormated + ".png", "rb"),
-        in_reply_to_status_id=tweet_id
-    )
+    try:
+        # Envoi d'un tweet
+        tweetSend = api.update_status_with_media(
+            sentenceUser +
+            " #" +
+            channel_name,
+            channel_name+"_user.png",
+            file=open("./../image/" + channel_name + '_user' +
+                      "_" + dateFormated + ".png", "rb"),
+            in_reply_to_status_id=tweet_id
+        )
 
-    print("🐧 Tweet USER sent for " + channel_name)
+        print("🐧 Tweet USER sent for " + channel_name)
+    except:
+        print("Bug send Twitter")
 
     # Deplacer le fichier dans un dossier archive
     shutil.move("./../user/" + channel_name + ".txt",
