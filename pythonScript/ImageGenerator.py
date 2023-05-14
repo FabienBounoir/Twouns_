@@ -164,23 +164,6 @@ for channel_name in channels_of_the_day:
     if channel_name == "":
         continue
 
-    # Envoi d'un tweet
-    tweetSend = api.update_status_with_media(
-        "Voici le récapitulatif des 30 derniers jours sur le chat Twitch de @"
-        + twitter_name +
-        " !\n#" +
-        channel_name,
-        channel_name+".png",
-        file=open("./../image/" + channel_name +
-                  "_" + dateFormated + ".png", "rb"),
-    )
-
-    print("🐧 Tweet CHANNEL sent for " + channel_name)
-
-    # Deplacer le fichier dans un dossier archive
-    shutil.move("./../tchat/" + channel_name + ".txt",
-                "./../archive-tchat/" + channel_name + "_" + dateFormated + ".txt")
-
     # load chat transcript text file
     try:
         text = open(
@@ -189,8 +172,6 @@ for channel_name in channels_of_the_day:
     except:
         print("❌ No user transcript found for " + channel_name)
         continue
-
-    tweet_id = tweetSend.id
 
     wc.generate(text)
     plt.imshow(wc)
@@ -213,6 +194,21 @@ for channel_name in channels_of_the_day:
     else:
         sentenceUser = "Si tu fais partie des spectateurs les plus fidèles, tu figures obligatoirement sur ce beau dessin."
 
+        # Envoi d'un tweet
+    tweetSend = api.update_status_with_media(
+        "Voici le récapitulatif des 30 derniers jours sur le chat Twitch de @"
+        + twitter_name +
+        " !\n#" +
+        channel_name,
+        channel_name+".png",
+        file=open("./../image/" + channel_name +
+                  "_" + dateFormated + ".png", "rb"),
+    )
+
+    tweet_id = tweetSend.id
+
+    print("🐧 Tweet CHANNEL sent for " + channel_name)
+
     try:
         # Envoi d'un tweet
         tweetSend = api.update_status_with_media(
@@ -228,6 +224,10 @@ for channel_name in channels_of_the_day:
         print("🐧 Tweet USER sent for " + channel_name)
     except:
         print("Bug send Twitter")
+
+    # Deplacer le fichier dans un dossier archive
+    shutil.move("./../tchat/" + channel_name + ".txt",
+                "./../archive-tchat/" + channel_name + "_" + dateFormated + ".txt")
 
     # Deplacer le fichier dans un dossier archive
     shutil.move("./../user/" + channel_name + ".txt",
