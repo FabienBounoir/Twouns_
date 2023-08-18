@@ -44,9 +44,16 @@ access_token = os.getenv("ACCESS_TOKEN")
 access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
 
 # Authentification
+
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
-api = tweepy.API(auth)
+apiOld = tweepy.API(auth)
+
+api = tweepy.Client(access_token=access_token,
+                    access_token_secret=access_token_secret,
+                    consumer_key=consumer_key,
+                    consumer_secret=consumer_secret)
+
 print("🔓 Authentification Twitter")
 
 # Date du jour
@@ -194,31 +201,35 @@ for channel_name in channels_of_the_day:
     else:
         sentenceUser = "Si tu fais partie des spectateurs les plus fidèles, tu figures obligatoirement sur ce beau dessin."
 
+    mediaRecapWord = apiOld.media_upload(channel_name+".png", file=open("./../image/" + channel_name +
+                  "_" + dateFormated + ".png", "rb"))
+
         # Envoi d'un tweet
-    tweetSend = api.update_status_with_media(
-        "Voici le récapitulatif des 30 derniers jours sur le chat Twitch de @"
+    tweetSend = api.create_tweet(
+        text="Voici le récapitulatif des 30 derniers jours sur le chat Twitch de @"
         + twitter_name +
         " !\n#" +
         channel_name,
-        channel_name+".png",
-        file=open("./../image/" + channel_name +
-                  "_" + dateFormated + ".png", "rb"),
+        media_ids=[mediaRecapWord.media_id]
     )
 
-    tweet_id = tweetSend.id
-
+    tweet_id = tweetSend.data.get('id')
+    
     print("🐧 Tweet CHANNEL sent for " + channel_name)
 
     try:
+        # Envoi d'un media
+        mediaRecapUser = apiOld.media_upload(channel_name+"_user.png",
+            file=open("./../image/" + channel_name + '_user' +
+                      "_" + dateFormated + ".png", "rb"))
+
         # Envoi d'un tweet
-        tweetSend = api.update_status_with_media(
-            sentenceUser +
+        tweetSend = api.create_tweet(
+            text=sentenceUser +
             " #" +
             channel_name,
-            channel_name+"_user.png",
-            file=open("./../image/" + channel_name + '_user' +
-                      "_" + dateFormated + ".png", "rb"),
-            in_reply_to_status_id=tweet_id
+            in_reply_to_tweet_id=tweet_id,
+            media_ids=[mediaRecapUser.media_id]
         )
 
         print("🐧 Tweet USER sent for " + channel_name)
