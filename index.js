@@ -12,7 +12,7 @@ const client = new tmi.Client({
         reconnect: true,
         secure: true
     },
-    channels: ["bounsbot"] //channels // récupération des chaînes à écouter
+    channels // récupération des chaînes à écouter
 });
 
 // Enregistrement des messages de tchat dans un fichier
