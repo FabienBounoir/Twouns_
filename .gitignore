@@ -6,6 +6,8 @@ tchatTranscript
 image_backup
 tchat/*.txt
 user/*.txt
+emote/*.txt
 image/*.png
 archive-tchat/*.txt
 archive-user/*.txt
+archive-emote/*.txt
