@@ -27,22 +27,31 @@ client.on('message', (channel, tags, message, self) => {
 
         let formatedEmotes = ""
 
-        for (let [id, emote] of emotesValues) {
-            let [start, end] = emote[0].split("-")
+        for (let [id, emotes] of emotesValues) {
 
-            let emoteName = message.slice(parseInt(start), parseInt(end) + 1)
+            for (let emote of emotes) {
+                let [start, end] = emote.split("-")
 
-            formatedEmotes += `${emoteName}#${id},`
 
-            message = (message.replace(emoteName, " ".repeat(parseInt(end) - parseInt(start) + 1)))
+                let emoteName = message.slice(parseInt(start), parseInt(end) + 1)
+
+                formatedEmotes += `${emoteName}#${id},`
+
+                message = (message.replace(emoteName, " ".repeat(parseInt(end) - parseInt(start) + 1)))
+            }
         }
 
         fs.appendFileSync(`./emote/${channel}.txt`, formatedEmotes)
+
+        if (message.replace(/\s/g, '').length === 0) return
     }
 
-    message = message.replace(/\s\s+/g, ' ')
+    if (message.replace(/\s/g, '').length > 0) {
+        message = message.replace(/\s\s+/g, ' ')
 
-    fs.appendFileSync(`./tchat/${channel}.txt`, `${message}\n`); // enregistrement du message dans un fichier
+        fs.appendFileSync(`./tchat/${channel}.txt`, `${message}\n`); // enregistrement du message dans un fichier
+    }
+
     fs.appendFileSync(`./user/${channel}.txt`, `${tags.username}\n`); // enregistrement du nom d'utilisateur dans un fichier
 });
 
