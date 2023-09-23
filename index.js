@@ -42,8 +42,6 @@ client.on('message', (channel, tags, message, self) => {
 
     message = message.replace(/\s\s+/g, ' ')
 
-    console.log("-" + message + "-")
-
     fs.appendFileSync(`./tchat/${channel}.txt`, `${message}\n`); // enregistrement du message dans un fichier
     fs.appendFileSync(`./user/${channel}.txt`, `${tags.username}\n`); // enregistrement du nom d'utilisateur dans un fichier
 });
@@ -52,7 +50,6 @@ client.on('join', (channel, username, self) => {
     if (self) return; // ignore les messages envoyés par le bot lui-même
 
     channel = channel.replace("#", "")
-    console.log(channel, username)
 
     if (filteredBot.includes(username) || (username == channel)) return; // ignore les messages envoyés par les bots filtrés
     fs.appendFileSync(`./user/${channel}.txt`, `${username}\n`); // enregistrement du nom d'utilisateur dans un fichier
