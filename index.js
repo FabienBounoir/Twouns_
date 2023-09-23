@@ -18,24 +18,35 @@ const client = new tmi.Client({
 // Enregistrement des messages de tchat dans un fichier
 client.on('message', (channel, tags, message, self) => {
     if (self) return; // ignore les messages envoyés par le bot lui-même
-
     channel = channel.replace("#", "")
 
     if (filteredBot.includes(tags.username) || (tags.username == channel)) return; // ignore les messages envoyés par les bots filtrés
+
+    if (tags.emotes) {
+        let emotesValues = Object.entries(tags.emotes)
+
+        let formatedEmotes = ""
+
+        for (let [id, emote] of emotesValues) {
+            let [start, end] = emote[0].split("-")
+
+            let emoteName = message.slice(parseInt(start), parseInt(end) + 1)
+
+            formatedEmotes += `${emoteName}#${id},`
+
+            message = (message.replace(emoteName, " ".repeat(parseInt(end) - parseInt(start) + 1)))
+        }
+
+        fs.appendFileSync(`./emote/${channel}.txt`, formatedEmotes)
+    }
+
+    message = message.replace(/\s\s+/g, ' ')
+
+    console.log("-" + message + "-")
+
     fs.appendFileSync(`./tchat/${channel}.txt`, `${message}\n`); // enregistrement du message dans un fichier
     fs.appendFileSync(`./user/${channel}.txt`, `${tags.username}\n`); // enregistrement du nom d'utilisateur dans un fichier
-
-    if (channel == "squeezie") {
-        let date = new Date();
-
-        if (date.getDate() == "9") {
-            fs.appendFileSync(`./tchat/gpexplorer.txt`, `${message}\n`); // enregistrement du message dans un fichier
-            fs.appendFileSync(`./user/gpexplorer.txt`, `${tags.username}\n`); // enregistrement du nom d'utilisateur dans un fichier
-        }
-    }
 });
-
-//https://static-cdn.jtvnw.net/emoticons/v1/emotesv2_3f327a65f575466f88ea00ffc74c98de/4.0
 
 client.on('join', (channel, username, self) => {
     if (self) return; // ignore les messages envoyés par le bot lui-même
