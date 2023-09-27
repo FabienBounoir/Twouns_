@@ -356,7 +356,11 @@ for channel_name in channels_of_the_day:
             position_x, position_y = 229, 404 + \
                 (emoteArray.index((emote_id, count)) * 145 +
                  62 * emoteArray.index((emote_id, count)))
-            image.paste(image_emote, (position_x, position_y), image_emote)
+
+            try:
+                image.paste(image_emote, (position_x, position_y), image_emote)
+            except:
+                image.paste(image_emote, (position_x, position_y))
 
             draw.text((1250, position_y+(145/2)),
                       "Envoyée " + str(count) + " fois", font=ImageFont.truetype("../assets/Oswald.ttf", size=70), fill=couleur_texte, anchor="rm")
