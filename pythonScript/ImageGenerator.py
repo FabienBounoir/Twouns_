@@ -1,6 +1,4 @@
 import os
-from dotenv import load_dotenv
-
 import re
 import tweepy
 import numpy as np
@@ -8,11 +6,25 @@ import matplotlib.pyplot as plt
 import json
 import shutil
 
+import tkinter as tk
+import requests
 
 from PIL import Image
 from datetime import datetime, timedelta
 from scipy.ndimage import gaussian_gradient_magnitude
 from wordcloud import WordCloud, ImageColorGenerator
+from dotenv import load_dotenv
+
+from collections import Counter
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
+from enum import Enum
+
+
+class Folder(Enum):
+    EMOTE = "emote"
+    TCHAT = "tchat"
+    USER = "user"
 
 
 def nextDayList():
@@ -33,6 +45,111 @@ def nextDayList():
         json.dump(liste_arrays, f)
 
 
+def get_font_size(text, max_font_size):
+    font = ImageFont.truetype("../assets/Oswald.ttf", size=max_font_size)
+
+    while font.getlength(text) > 380:
+        max_font_size -= 1
+        font = ImageFont.truetype("../assets/Oswald.ttf", size=max_font_size)
+
+    return font
+
+
+def set_token_twitch():
+    client_id = os.getenv("TWITCH_CLIENT_ID")
+    client_secret = os.getenv("TWITCH_CLIENT_SECRET")
+
+    # URL de l'endpoint Twitch pour obtenir un jeton d'accès
+    token_url = f"https://id.twitch.tv/oauth2/token?client_id={client_id}&client_secret={client_secret}&grant_type=client_credentials"
+
+    try:
+        # Effectuer la demande POST pour obtenir le jeton d'accès
+        response = requests.post(token_url)
+        response.raise_for_status()
+
+        # Obtenir les informations du jeton d'accès à partir de la réponse JSON
+        info_token = response.json()
+
+        # Définir le jeton Twitch dans l'objet client
+        return info_token["access_token"]
+    except requests.exceptions.RequestException as e:
+        print(f"Erreur : {e}")
+
+
+def get_twitch_profile_picture(username):
+    client_id = os.getenv("TWITCH_CLIENT_ID")
+
+    # Define the Twitch API URL
+    url = f'https://api.twitch.tv/helix/users?login={username}'
+
+    # Set up the headers with your Client ID and Client Secret
+    headers = {
+        'Client-ID': client_id,
+        'Authorization': f'Bearer {token_twitch}'
+    }
+
+    try:
+        # Make a GET request to the Twitch API
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+
+        # Parse the JSON response
+        data = response.json()
+
+        # Get the user's profile picture URL from the response
+        profile_picture_url = data['data'][0]['profile_image_url']
+
+        response = requests.get(profile_picture_url)
+
+        # Vérifiez si le téléchargement s'est bien passé (statut 200)
+        if response.status_code == 200:
+            # Obtenez le contenu de l'image
+            image_avatar = Image.open(BytesIO(response.content))
+
+            nouvelle_taille = (
+                145, int(image_avatar.height * (145 / image_avatar.width)))
+            image_avatar = image_avatar.resize(nouvelle_taille)
+
+            return image_avatar
+        else:
+            raise Exception("Erreur lors du téléchargement de l'image.")
+
+    except Exception as e:
+        image_avatar = Image.open("../assets/defaultAvatar.png")
+
+        nouvelle_taille = (
+            145, int(image_avatar.height * (145 / image_avatar.width)))
+        image_avatar = image_avatar.resize(nouvelle_taille)
+
+        return image_avatar
+
+
+def getText(folder, channel):
+    print("📝 Récupération "+folder+" pour la chaine " + channel)
+    texte = ""
+
+    # Récupérer les textes
+    with open("../"+folder+"/"+channel+".txt", "r") as f:
+        texte += f.read()
+
+    return texte
+
+
+def getCountAndSize(text, top, split):
+    arrayElement = text.split(split)
+    arrayElement.pop()
+
+    arrayCounter = Counter(arrayElement)
+
+    sorted_emotes = sorted(arrayCounter.items(),
+                           key=lambda x: x[1], reverse=True)
+
+    size = len(sorted_emotes)
+    sorted_emotes = sorted_emotes[:top]
+
+    return sorted_emotes, size
+
+
 # load env variables
 print("🔄 Load env variables")
 load_dotenv()
@@ -42,6 +159,9 @@ consumer_key = os.getenv("API_KEY")
 consumer_secret = os.getenv("API_SECRET_KEY")
 access_token = os.getenv("ACCESS_TOKEN")
 access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
+
+# Twitch Token
+token_twitch = set_token_twitch()
 
 # Authentification
 
@@ -193,6 +313,86 @@ for channel_name in channels_of_the_day:
                "_" + dateFormated + ".png")
     print("💾 Image USER saved for " + channel_name)
 
+    # ---------------------------------
+
+    emoteText = getText(Folder.EMOTE.value, channel)
+    userText = getText(Folder.USER.value, channel)
+    messageText = getText(Folder.TCHAT.value, channel)
+
+    # Récupérer les emotes, users et messages
+    emoteArray, emoteSize = getCountAndSize(emoteText, 5, ",")
+    userArray, userSize = getCountAndSize(userText, 5, "\n")
+    messageArray, messageSize = getCountAndSize(messageText, 5, "\n")
+
+    largeur, hauteur = 2836, 1690
+    image = Image.new('RGBA', (largeur, hauteur), color='#101010')
+
+    # Chargez une image existante
+    templateImage = Image.open('../assets/template.png')
+
+    # Collez l'image sur l'image principale à une position spécifique
+    image.paste(templateImage, (0, 0))
+    draw = ImageDraw.Draw(image)
+
+    couleur_texte = (255, 255, 255)
+
+    for emote_id, count in emoteArray:
+        print("🔎 Emote: " + emote_id)
+        # Récupérer l'emote
+        url_emote = "https://static-cdn.jtvnw.net/emoticons/v2/" + \
+            emote_id.split("#")[1]+"/static/dark/3.0"
+        response = requests.get(url_emote)
+
+        # Vérifiez si le téléchargement s'est bien passé (statut 200)
+        if response.status_code == 200:
+            # Obtenez le contenu de l'image
+            image_emote = Image.open(BytesIO(response.content))
+
+            nouvelle_taille = (
+                145, int(image_emote.height * (145 / image_emote.width)))
+            image_emote = image_emote.resize(nouvelle_taille)
+
+            # Collez l'image de l'emote sur l'image principale à une position spécifique
+            position_x, position_y = 229, 404 + \
+                (emoteArray.index((emote_id, count)) * 145 +
+                 62 * emoteArray.index((emote_id, count)))
+            image.paste(image_emote, (position_x, position_y), image_emote)
+
+            draw.text((1250, position_y+(145/2)),
+                      "Envoyée " + str(count) + " fois", font=ImageFont.truetype("../assets/Oswald.ttf", size=70), fill=couleur_texte, anchor="rm")
+        else:
+            print("Erreur lors du téléchargement de l'image " + emote_id)
+
+    for user, count in userArray:
+        print("👤 User: " + user)
+
+        # Récupérer l'emote
+        image_avatar = get_twitch_profile_picture(user)
+
+        position_x, position_y = 1589, 404 + \
+            (userArray.index((user, count)) * 145 +
+             62 * userArray.index((user, count)))
+
+        image.paste(image_avatar, (position_x, position_y))
+
+        font = get_font_size(user, 60)
+
+        draw.text((position_x + 170, position_y+(145/2)), user,
+                  font=font, fill=couleur_texte, anchor="lm")
+
+        draw.text((2608, position_y+(145/2)),
+                  str(count) + " Messages", font=ImageFont.truetype("../assets/Oswald.ttf", size=70), fill=couleur_texte, anchor="rm")
+
+    # Ajoutez le texte à l'image
+    draw.text((1418, 1530),
+              f"{messageSize} messages ont été envoyés par {userSize} personnes",
+              font=ImageFont.truetype("../assets/Oswald.ttf", size=80), fill=couleur_texte, anchor="mm")
+
+    image.save("./../image/" + channel_name + '_top' +
+               "_" + dateFormated + ".png")
+
+    # ---------------------------------
+
     if channel_name == "":
         continue
 
@@ -202,9 +402,9 @@ for channel_name in channels_of_the_day:
         sentenceUser = "Si tu fais partie des spectateurs les plus fidèles, tu figures obligatoirement sur ce beau dessin."
 
     mediaRecapWord = apiOld.media_upload(channel_name+".png", file=open("./../image/" + channel_name +
-                  "_" + dateFormated + ".png", "rb"))
+                                                                        "_" + dateFormated + ".png", "rb"))
 
-        # Envoi d'un tweet
+    # Envoi d'un tweet
     tweetSend = api.create_tweet(
         text="Voici le récapitulatif des 30 derniers jours sur le chat Twitch de @"
         + twitter_name +
@@ -214,14 +414,14 @@ for channel_name in channels_of_the_day:
     )
 
     tweet_id = tweetSend.data.get('id')
-    
+
     print("🐧 Tweet CHANNEL sent for " + channel_name)
 
     try:
         # Envoi d'un media
         mediaRecapUser = apiOld.media_upload(channel_name+"_user.png",
-            file=open("./../image/" + channel_name + '_user' +
-                      "_" + dateFormated + ".png", "rb"))
+                                             file=open("./../image/" + channel_name + '_user' +
+                                                       "_" + dateFormated + ".png", "rb"))
 
         # Envoi d'un tweet
         tweetSend = api.create_tweet(
@@ -232,9 +432,28 @@ for channel_name in channels_of_the_day:
             media_ids=[mediaRecapUser.media_id]
         )
 
-        print("🐧 Tweet USER sent for " + channel_name)
+        print("🐧 Tweet USER send for " + channel_name)
     except:
-        print("Bug send Twitter")
+        print("Bug send Tweet User")
+
+    tweet_id = tweetSend.data.get('id')
+
+    try:
+        # Envoi d'un media
+        mediaRecapUser = apiOld.media_upload(channel_name+"_top.png",
+                                             file=open("./../image/" + channel_name + '_top' +
+                                                       "_" + dateFormated + ".png", "rb"))
+
+        # Envoi d'un tweet
+        tweetSend = api.create_tweet(
+            text=f"Hello @{twitter_name} 👋,\nVoici un petit récapitulatif qui pourrait t'intéresser sur les emotes🎉 et les utilisateurs👤 qui se sont le plus manifestés sur ton tchat #Twitch #"+channel_name,
+            in_reply_to_tweet_id=tweet_id,
+            media_ids=[mediaRecapUser.media_id]
+        )
+
+        print("🐧 Tweet TOP send for " + channel_name)
+    except:
+        print("Bug send TOP Tweet")
 
     # Deplacer le fichier dans un dossier archive
     shutil.move("./../tchat/" + channel_name + ".txt",
@@ -244,23 +463,10 @@ for channel_name in channels_of_the_day:
     shutil.move("./../user/" + channel_name + ".txt",
                 "./../archive-user/" + channel_name + "_" + dateFormated + ".txt")
 
+    # Deplacer le fichier dans un dossier archive
+    shutil.move("./../emote/" + channel_name + ".txt",
+                "./../archive-emote/" + channel_name + "_" + dateFormated + ".txt")
+
 
 print("🚀 All images generated")
 nextDayList()
-
-
-# if os.path.exists("./../tchat/" + file):
-#     os.remove("./../tchat/" + file)
-#     print("✅ File " + file + " deleted")
-# else:
-#     print(f"{'./../tchat/'+file} n'existe pas")
-
-# plt.figure(figsize=(10, 10))
-# plt.title("Original Image")
-# plt.imshow(logo_color)
-
-# plt.figure(figsize=(10, 10))
-# plt.title("Edge map")
-# plt.imshow(edges)
-# plt.axis("off")
-# plt.show()
