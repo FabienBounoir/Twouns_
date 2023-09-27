@@ -315,9 +315,9 @@ for channel_name in channels_of_the_day:
 
     # ---------------------------------
 
-    emoteText = getText(Folder.EMOTE.value, channel)
-    userText = getText(Folder.USER.value, channel)
-    messageText = getText(Folder.TCHAT.value, channel)
+    emoteText = getText(Folder.EMOTE.value, channel_name)
+    userText = getText(Folder.USER.value, channel_name)
+    messageText = getText(Folder.TCHAT.value, channel_name)
 
     # Récupérer les emotes, users et messages
     emoteArray, emoteSize = getCountAndSize(emoteText, 5, ",")
