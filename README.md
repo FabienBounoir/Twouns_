@@ -49,9 +49,9 @@ Si vous voulez automatiser l'exécution d'un script Python sur une base quotidie
 
 ## Demo
 
-[![Squeezie best user](https://media.discordapp.net/attachments/1014101467126304798/1156646852054233243/F55cCf7XkAA4K-l.png)](https://twitter.com/Twouns_/status/1701898912817086567)
+[![Squeezie best user](https://media.discordapp.net/attachments/1014101467126304798/1070084261631246537/squeezie-12_2022.png)](https://twitter.com/Twouns_/status/1701898912817086567)
 
-[![bastiui best word](https://media.discordapp.net/attachments/1014101467126304798/1156647125334114364/F6iopA3WoAAh_dE.png)](https://twitter.com/Twouns_/status/1704797887035773019)
+[![bastiui best word](https://media.discordapp.net/attachments/1014101467126304798/1070084261366993057/bastiui-12_2022.png)](https://twitter.com/Twouns_/status/1704797887035773019)
 
 [![Recap Channel JlTomy](https://media.discordapp.net/attachments/1014101467126304798/1156646988918566993/F7DG9GQXsAA60sM.png)](https://twitter.com/Twouns_/status/1707083015552176414)
 
