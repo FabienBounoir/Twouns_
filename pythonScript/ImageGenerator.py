@@ -149,6 +149,14 @@ def getCountAndSize(text, top, split):
 
     return sorted_emotes, size
 
+def getCountAfterSplit(text, split):
+    arrayElement = text.split(split)
+    arrayElement.pop()
+
+    size = len(arrayElement)
+
+    return size
+
 
 # load env variables
 print("🔄 Load env variables")
@@ -322,7 +330,7 @@ for channel_name in channels_of_the_day:
     # Récupérer les emotes, users et messages
     emoteArray, emoteSize = getCountAndSize(emoteText, 5, ",")
     userArray, userSize = getCountAndSize(userText, 5, "\n")
-    messageArray, messageSize = getCountAndSize(messageText, 5, "\n")
+    messageSize = getCountAfterSplit(messageText, "\n")
 
     largeur, hauteur = 2836, 1690
     image = Image.new('RGBA', (largeur, hauteur), color='#101010')
