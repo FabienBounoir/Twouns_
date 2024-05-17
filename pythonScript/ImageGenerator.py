@@ -44,6 +44,27 @@ def nextDayList():
     with open("channel-order.json", "w") as f:
         json.dump(liste_arrays, f)
 
+def read_first_12_mb(file_path):
+    buffer_size = 1024 * 1024  # 1 Mo
+    min_size = buffer_size  # 1 Mo
+    max_size = 12 * buffer_size  # 12 Mo
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = ''
+            while len(data.encode('utf-8')) < max_size:
+                chunk = file.read(buffer_size)
+                if not chunk:
+                    break
+                data += chunk
+                if len(data.encode('utf-8')) >= min_size:
+                    return data  # Retourne les données dès qu'elles dépassent 1 Mo
+            return '__LESS_THAN_1MB__'  # Retourne une valeur spécifique pour indiquer moins de 1 Mo
+    except FileNotFoundError:
+        print("❌ No user transcript found for " + channel_name)
+        return None  # Retourne None si le fichier est introuvable
+
+
 
 def get_font_size(text, max_font_size):
     font = ImageFont.truetype("../assets/Oswald.ttf", size=max_font_size)
@@ -220,11 +241,16 @@ for channel_name in channels_of_the_day:
 
     # load chat transcript text file
     try:
-        text = open(
-            os.path.join(d, "./../tchat/" + channel_name + ".txt"), encoding="utf-8"
-        ).read()
+        text = read_first_12_mb(os.path.join(d, "./../tchat/" + channel_name + ".txt"))
+        
+        if text is None:
+            print("❌ No tchat transcript found for " + channel_name)
+            continue
+        elif text == '__LESS_THAN_1MB__':
+            print("Le fichier tchat de " + channel_name + " est inférieur à 1 Mo, ACTION SKIP...")
+            continue
     except:
-        print("❌ No chat transcript found for " + channel_name)
+        print("❌ No tchat transcript found for " + channel_name)
         continue
 
     logo_path = os.path.join(d, "./../logoChannel/")
@@ -301,7 +327,13 @@ for channel_name in channels_of_the_day:
 
     # load chat transcript text file
     try:
-        text = open(
+        text = read_first_12_mb(os.path.join(d, "./../user/" + channel_name + ".txt"))
+
+        if text is None:
+            print("❌ No user transcript found for " + channel_name)
+            continue
+        
+        open(
             os.path.join(d, "./../user/" + channel_name + ".txt"), encoding="utf-8"
         ).read()
     except:
