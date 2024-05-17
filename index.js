@@ -2,8 +2,12 @@ const tmi = require('tmi.js'); // pour utiliser l'API Twitch
 const fs = require('fs'); // pour enregistrer le texte dans un fichier
 const filteredBot = require('./filteredBot.json');
 
+console.log("[LOG] Twouns started")
+
 //get file in directory
 const channels = fs.readdirSync('./logoChannel').filter(file => file.endsWith('.png')).map(file => file.split("-")[0])
+
+console.log("[LOG]    listen: ", channels)
 
 // Connexion à l'API Twitch
 const client = new tmi.Client({
