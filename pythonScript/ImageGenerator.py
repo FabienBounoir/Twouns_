@@ -44,7 +44,7 @@ def nextDayList():
     with open("channel-order.json", "w") as f:
         json.dump(liste_arrays, f)
 
-def read_first_12_mb(file_path):
+def read_first_12_mb(file_path, less_one_mb=False):
     buffer_size = 1024 * 1024  # 1 Mo
     min_size = buffer_size  # 1 Mo
     max_size = 12 * buffer_size  # 12 Mo
@@ -59,6 +59,10 @@ def read_first_12_mb(file_path):
                 data += chunk
                 if len(data.encode('utf-8')) >= min_size:
                     return data  # Retourne les données dès qu'elles dépassent 1 Mo
+
+            if less_one_mb:
+                return data
+
             return '__LESS_THAN_1MB__'  # Retourne une valeur spécifique pour indiquer moins de 1 Mo
     except FileNotFoundError:
         print("❌ No user transcript found for " + channel_name)
@@ -305,7 +309,10 @@ for channel_name in channels_of_the_day:
         max_font_size=20,
         random_state=42,
         relative_scaling=0,
+        contour_color='steelblue',
+        contour_width=3,
     )
+
     print("🔠 Wordcloud generated for " + channel_name)
 
     # generate word cloud
@@ -322,12 +329,14 @@ for channel_name in channels_of_the_day:
                "_" + dateFormated + ".png")
     print("💾 Image saved for " + channel_name)
 
+    continue
+
     if channel_name == "":
         continue
 
     # load chat transcript text file
     try:
-        text = read_first_12_mb(os.path.join(d, "./../user/" + channel_name + ".txt"))
+        text = read_first_12_mb(os.path.join(d, "./../user/" + channel_name + ".txt"), True)
 
         if text is None:
             print("❌ No user transcript found for " + channel_name)
