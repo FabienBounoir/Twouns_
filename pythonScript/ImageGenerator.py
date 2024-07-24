@@ -27,7 +27,7 @@ class Folder(Enum):
     USER = "user"
 
 
-def nextDayList():
+# def nextDayList():
     print("📝 Update l'ordre des channels")
 
     # mettre la liste à la fin de la liste
@@ -224,7 +224,7 @@ channels_of_the_day = data[0]
 # check if array is empty
 if not channels_of_the_day:
     print("❌ No channel found for this date")
-    nextDayList()
+    # nextDayList()
     exit()
 
 
@@ -304,13 +304,12 @@ for channel_name in channels_of_the_day:
     # relative_scaling=0 means the frequencies in the data are reflected less
     # acurately but it makes a better picture
     wc = WordCloud(
-        max_words=8000,
+        max_words=2000,
         mask=logo_mask,
-        max_font_size=30,
+        max_font_size=40,
         random_state=42,
-        relative_scaling=1,
-        contour_color='steelblue',
-        contour_width=3,
+        relative_scaling=0,
+        repeat=True,
     )
 
     print("🔠 Wordcloud generated for " + channel_name)
@@ -507,17 +506,17 @@ for channel_name in channels_of_the_day:
         print("Bug send TOP Tweet")
 
     # Deplacer le fichier dans un dossier archive
-    shutil.move("./../tchat/" + channel_name + ".txt",
-                "./../archive-tchat/" + channel_name + "_" + dateFormated + ".txt")
+    # shutil.move("./../tchat/" + channel_name + ".txt",
+    #             "./../archive-tchat/" + channel_name + "_" + dateFormated + ".txt")
 
-    # Deplacer le fichier dans un dossier archive
-    shutil.move("./../user/" + channel_name + ".txt",
-                "./../archive-user/" + channel_name + "_" + dateFormated + ".txt")
+    # # Deplacer le fichier dans un dossier archive
+    # shutil.move("./../user/" + channel_name + ".txt",
+    #             "./../archive-user/" + channel_name + "_" + dateFormated + ".txt")
 
-    # Deplacer le fichier dans un dossier archive
-    shutil.move("./../emote/" + channel_name + ".txt",
-                "./../archive-emote/" + channel_name + "_" + dateFormated + ".txt")
+    # # Deplacer le fichier dans un dossier archive
+    # shutil.move("./../emote/" + channel_name + ".txt",
+    #             "./../archive-emote/" + channel_name + "_" + dateFormated + ".txt")
 
 
 print("🚀 All images generated")
-nextDayList()
+# nextDayList()
