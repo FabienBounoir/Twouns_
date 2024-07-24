@@ -329,8 +329,6 @@ for channel_name in channels_of_the_day:
                "_" + dateFormated + ".png")
     print("💾 Image saved for " + channel_name)
 
-    continue
-
     if channel_name == "":
         continue
 
