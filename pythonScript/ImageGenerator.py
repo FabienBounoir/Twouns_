@@ -506,17 +506,17 @@ for channel_name in channels_of_the_day:
         print("Bug send TOP Tweet")
 
     # Deplacer le fichier dans un dossier archive
-    # shutil.move("./../tchat/" + channel_name + ".txt",
-    #             "./../archive-tchat/" + channel_name + "_" + dateFormated + ".txt")
+    shutil.move("./../tchat/" + channel_name + ".txt",
+                "./../archive-tchat/" + channel_name + "_" + dateFormated + ".txt")
 
-    # # Deplacer le fichier dans un dossier archive
-    # shutil.move("./../user/" + channel_name + ".txt",
-    #             "./../archive-user/" + channel_name + "_" + dateFormated + ".txt")
+    # Deplacer le fichier dans un dossier archive
+    shutil.move("./../user/" + channel_name + ".txt",
+                "./../archive-user/" + channel_name + "_" + dateFormated + ".txt")
 
-    # # Deplacer le fichier dans un dossier archive
-    # shutil.move("./../emote/" + channel_name + ".txt",
-    #             "./../archive-emote/" + channel_name + "_" + dateFormated + ".txt")
+    # Deplacer le fichier dans un dossier archive
+    shutil.move("./../emote/" + channel_name + ".txt",
+                "./../archive-emote/" + channel_name + "_" + dateFormated + ".txt")
 
 
 print("🚀 All images generated")
-# nextDayList()
+nextDayList()
