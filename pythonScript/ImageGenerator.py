@@ -44,10 +44,10 @@ def nextDayList():
     with open("channel-order.json", "w") as f:
         json.dump(liste_arrays, f)
 
-def read_first_12_mb(file_path, less_one_mb=False):
+def read_first_10_mb(file_path, less_one_mb=False):
     buffer_size = 1024 * 1024  # 1 Mo
     min_size = buffer_size  # 1 Mo
-    max_size = 12 * buffer_size  # 12 Mo
+    max_size = 10 * buffer_size  # 10 Mo
 
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -245,7 +245,7 @@ for channel_name in channels_of_the_day:
 
     # load chat transcript text file
     try:
-        text = read_first_12_mb(os.path.join(d, "./../tchat/" + channel_name + ".txt"))
+        text = read_first_10_mb(os.path.join(d, "./../tchat/" + channel_name + ".txt"))
         
         if text is None:
             print("❌ No tchat transcript found for " + channel_name)
@@ -304,11 +304,11 @@ for channel_name in channels_of_the_day:
     # relative_scaling=0 means the frequencies in the data are reflected less
     # acurately but it makes a better picture
     wc = WordCloud(
-        max_words=10000,
+        max_words=8000,
         mask=logo_mask,
-        max_font_size=20,
+        max_font_size=30,
         random_state=42,
-        relative_scaling=0,
+        relative_scaling=1,
         contour_color='steelblue',
         contour_width=3,
     )
@@ -336,7 +336,7 @@ for channel_name in channels_of_the_day:
 
     # load chat transcript text file
     try:
-        text = read_first_12_mb(os.path.join(d, "./../user/" + channel_name + ".txt"), True)
+        text = read_first_10_mb(os.path.join(d, "./../user/" + channel_name + ".txt"), True)
 
         if text is None:
             print("❌ No user transcript found for " + channel_name)
