@@ -27,7 +27,7 @@ class Folder(Enum):
     USER = "user"
 
 
-# def nextDayList():
+def nextDayList():
     print("📝 Update l'ordre des channels")
 
     # mettre la liste à la fin de la liste
@@ -224,7 +224,7 @@ channels_of_the_day = data[0]
 # check if array is empty
 if not channels_of_the_day:
     print("❌ No channel found for this date")
-    # nextDayList()
+    nextDayList()
     exit()
 
 
