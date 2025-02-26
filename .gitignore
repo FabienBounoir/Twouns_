@@ -11,3 +11,7 @@ image/*.png
 archive-tchat/*.txt
 archive-user/*.txt
 archive-emote/*.txt
+
+**.DS_Store
+
+2023year/**
